@@ -493,7 +493,7 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
 	function updateBatchSize(
 		uint256 batchSize
 	) external onlyOwner returns (bool changed) {
-		require((batchSize > 0) && (_batchSize <= 10), "Bch Sze");
+		require((batchSize > 0) && (batchSize <= 10), "Bch Sze");
 		changed = _batchSize == batchSize ? false : true;
 		_batchSize = batchSize;
 	}
@@ -547,22 +547,22 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
 		}
 	}
 
-	// // method to push metadata end points up
-    // function addMetadata(
-    //     string[] memory metadata
-    // ) external onlyOwner returns (uint totalLoaded) {
-    //     if (_token != address(0)) {
-    //         require(
-    //             (_totalMinted + _metadata.length + metadata.length) <=
-    //                 _maxSupply,
-    //             "tMM"
-    //         );
-    //     }
-    //     for (uint i = 0; i < metadata.length; i++) {
-    //         _metadata.push(metadata[i]);
-    //     }
-    //     totalLoaded = _metadata.length;
-    // }
+	// method to push metadata end points up
+    function addMetadata(
+        string[] memory metadata
+    ) external onlyOwner returns (uint totalLoaded) {
+        if (_token != address(0)) {
+            require(
+                (_totalMinted + _metadata.length + metadata.length) <=
+                    _maxSupply,
+                "tMM"
+            );
+        }
+        for (uint i = 0; i < metadata.length; i++) {
+            _metadata.push(metadata[i]);
+        }
+        totalLoaded = _metadata.length;
+    }
 
 	// Helper method to strip storage requirememts
     // boolean toogle to remove the token ID if full reset
@@ -612,19 +612,19 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
     //     token = _token;
     // }
 
-    // // @return numMinted helper function to check how many a wallet has minted
-    // function getNumberMintedByAddress() external view returns (uint numMinted) {
-    //     bool found;
-    //     uint numPreviouslyMinted;
-    //     (found, numPreviouslyMinted) = _addressToNumMintedMap.tryGet(
-    //         msg.sender
-    //     );
-    //     if (found) {
-    //         numMinted = numPreviouslyMinted;
-    //     } else {
-    //         numMinted = 0;
-    //     }
-    // }
+    // @return numMinted helper function to check how many a wallet has minted
+    function getNumberMintedByAddress() external view returns (uint numMinted) {
+        bool found;
+        uint numPreviouslyMinted;
+        (found, numPreviouslyMinted) = _addressToNumMintedMap.tryGet(
+            msg.sender
+        );
+        if (found) {
+            numMinted = numPreviouslyMinted;
+        } else {
+            numMinted = 0;
+        }
+    }
 
 	// Likely only viable with smaller mints
     // this function will hold the wallet addresses and the number of tokens minted by each wallet, respectively
@@ -662,33 +662,33 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
         }
     }
 
-	// // Likely only viable with smaller mints
-    // /// @return wlWalletList list of wallet who minted
-    // /// @return wlNumMintedList lst of number minted
-    // function getNumberMintedByAllWlAddresses()
-    //     external
-    //     view
-    //     onlyOwner
-    //     returns (address[] memory wlWalletList, uint[] memory wlNumMintedList)
-    // {
-    //     wlWalletList = new address[](_wlAddressToNumMintedMap.length());
-    //     wlNumMintedList = new uint[](_wlAddressToNumMintedMap.length());
-    //     for (uint a = 0; a < _wlAddressToNumMintedMap.length(); a++) {
-    //         (wlWalletList[a], wlNumMintedList[a]) = _wlAddressToNumMintedMap.at(
-    //             a
-    //         );
-    //     }
-    // }
+	// Likely only viable with smaller mints
+    /// @return wlWalletList list of wallet who minted
+    /// @return wlNumMintedList lst of number minted
+    function getNumberMintedByAllWlAddresses()
+        external
+        view
+        onlyOwner
+        returns (address[] memory wlWalletList, uint[] memory wlNumMintedList)
+    {
+        wlWalletList = new address[](_wlAddressToNumMintedMap.length());
+        wlNumMintedList = new uint[](_wlAddressToNumMintedMap.length());
+        for (uint a = 0; a < _wlAddressToNumMintedMap.length(); a++) {
+            (wlWalletList[a], wlNumMintedList[a]) = _wlAddressToNumMintedMap.at(
+                a
+            );
+        }
+    }
 
-	// //@return getRemaningMint number of NFTs left to mint
-    // function getRemainingMint() external view returns (uint256 remaningMint) {
-    //     remaningMint = _metadata.length;
-    // }
+	//@return getRemaningMint number of NFTs left to mint
+    function getRemainingMint() external view returns (uint256 remaningMint) {
+        remaningMint = _metadata.length;
+    }
 
-    // //@return getBatchSize the size for mint/transfer
-    // function getBatchSize() external view returns (uint batchSize) {
-    //     batchSize = _batchSize;
-    // }
+    //@return getBatchSize the size for mint/transfer
+    function getBatchSize() external view returns (uint batchSize) {
+        batchSize = _batchSize;
+    }
 
     // /// check the current Whitelist for minting
     // /// @return wl an array of addresses currently enabled for allowance approval
@@ -705,23 +705,23 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
     //     }
     // }
 
-	// /// @return mintEconomics basic struct with mint economics details
-    // function getMintEconomics()
-    //     external
-    //     view
-    //     returns (MintEconomics memory mintEconomics)
-    // {
-    //     mintEconomics = _mintEconomics;
-    // }
+	/// @return mintEconomics basic struct with mint economics details
+    function getMintEconomics()
+        external
+        view
+        returns (MintEconomics memory mintEconomics)
+    {
+        mintEconomics = _mintEconomics;
+    }
 
-    // /// @return mintTiming basic struct with mint economics details
-    // function getMintTiming()
-    //     external
-    //     view
-    //     returns (MintTiming memory mintTiming)
-    // {
-    //     mintTiming = _mintTiming;
-    // }
+    /// @return mintTiming basic struct with mint economics details
+    function getMintTiming()
+        external
+        view
+        returns (MintTiming memory mintTiming)
+    {
+        mintTiming = _mintTiming;
+    }
 
     // // check if the address is in wl
     // // @param addressToCheck the address to check in WL
