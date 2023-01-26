@@ -118,7 +118,7 @@ describe('Check SC deployment...', function() {
 		const [hbarCost] = await getSettings('getCost', 'hbarCost');
 		expect(Number(hbarCost) == 0 ).to.be.true;
 		const mintEconomics = await getSetting('getMintEconomics', 'mintEconomics');
-		expect(!mintEconomics[0] &&
+		expect(mintEconomics[0] == 0 &&
 			mintEconomics[1] == 0 &&
 			mintEconomics[2] == 20 &&
 			mintEconomics[3] == 0 &&
@@ -127,7 +127,7 @@ describe('Check SC deployment...', function() {
 		const mintTiming = await getSetting('getMintTiming', 'mintTiming');
 		expect(mintTiming[0] == 0 &&
 			mintTiming[1] == 0 &&
-			mintTiming[2] &&
+			mintTiming[2] == true &&
 			mintTiming[3] == 0 &&
 			mintTiming[4] == 0 &&
 			mintTiming[5] == false).to.be.true;
@@ -193,7 +193,7 @@ describe('Check SC deployment...', function() {
 		catch (err) {
 			errorCount++;
 		}
-		expect(errorCount).to.be.equal(1);
+		expect(errorCount).to.be.equal(2);
 	});
 
 	it('Owner cannot set batch size to bad values', async function() {
