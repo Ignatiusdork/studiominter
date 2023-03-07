@@ -760,7 +760,7 @@ async function getSetting(fcnName, expectedVar, gasLim = 100000) {
 
 function encodeFunctionCall(functionName, parameters) {
 	const functionAbi = abi.find((func) => func.name === functionName && func.type === 'function');
-	console.log(functionAbi);
+	//console.log(functionAbi);
 	const encodedParametersHex = web3.eth.abi.encodeFunctionCall(functionAbi, parameters).slice(2);
 	return Buffer.from(encodedParametersHex, 'hex');
 }
@@ -884,7 +884,7 @@ async function contractExecuteWithStructArgs(cId, gasLim, fcnName, params, amoun
  */
  function decodeFunctionResult(initialiseNFTMint, resultAsBytes) {
 	const functionAbi = abi.find(func => func.name === initialiseNFTMint);
-	console.log(functionAbi);
+	//console.log(functionAbi);
 	const functionParameters = functionAbi.outputs;
 	const resultHex = '0x'.concat(Buffer.from(resultAsBytes).toString('hex'));
 	const result = web3.eth.abi.decodeParameters(functionParameters, resultHex);
@@ -954,6 +954,22 @@ async function useSetterInts(fcnName, ...values) {
 	}
 	const [setterIntsRx, setterResult] = await contractExecuteFcn(contractId, gasLim, fcnName, params);
 	return [setterIntsRx.status.toString(), setterResult];
+}
+
+/**
+ *
+ * @param {Number} quantity
+ * @param {Number | Long} tinybarPmt
+ * @param {Client=} clientToUse
+ * @param {Number=} gasLim
+ */
+// eslint-disable-next-line no-unused-vars
+async function mintNFT(quantity, tinybarPmt, clientToUse = client, gasLim = 2000000) {
+	const params = [quantity];
+
+	const [mintRx, mintResults] =
+		await contractExecuteWithStructArgs(contractId, gasLim, 'mintNFT', params, new Hbar(tinybarPmt, HbarUnit.Tinybar), clientToUse);
+	return [mintRx.status.toString(), mintResults['serials']] ;
 }
 
 /**
