@@ -906,6 +906,16 @@ async function useSetterBool(fcnName, value, gasLim = 200000) {
 	return setterAddressRx.status.toString();
 }
 
+/*
+ * basci sleep function
+ * @param {number} ms milliseconds to sleep
+ * @returns {Promise}
+ */
+// eslint-disable-next-line no-unused-vars
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /**
  * Generic setter caller
  * @param {string} fcnName
