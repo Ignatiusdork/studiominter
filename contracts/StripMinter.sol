@@ -260,7 +260,6 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
 			if (responseCode != HederaResponseCodes.SUCCESS) {
 				revert ("FSMint");
 			}
-
 			
 			// transfer the token to the user
 			address[] memory senderList = new address[](serialNumbers.length);
@@ -347,142 +346,142 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
 		);
 	}
 
-	// Transfer hbar out of the contract
-	// function transferHbar(
-	// 	address payable receiverAddress,
-	// 	uint amount
-	// ) external onlyOwner {
-	// 	require(
-	// 		block.timestamp >= 
-	// 			(_mintTiming.lastMintTime + _mintTiming.refundWindow),
-	// 		"HbarCdown"
-	// 	);
-	// 	Address.sendValue(receiverAddress, amount);
-	// }
+	//Transfer hbar out of the contract
+	function transferHbar(
+		address payable receiverAddress,
+		uint amount
+	) external onlyOwner {
+		require(
+			block.timestamp >= 
+				(_mintTiming.lastMintTime + _mintTiming.refundWindow),
+			"HbarCdown"
+		);
+		Address.sendValue(receiverAddress, amount);
+	}
 
 	//Add an address to the allowance WL
-	// function addToWhitelist(address[] memory newAddresses) external onlyOwner {
-	// 	for (uint a = 0; a < newAddresses.length; a++) {
-	// 		bool result = _whitelistedAddressQtyMap.set(
-	// 			newAddresses[a],
-	// 			_mintEconomics.maxWlAddressMint
-	// 		);
-	// 		emit MinterContractMessage(
-	// 			"ADD WL",
-	// 			newAddresses[a],
-	// 			result ? 1 : 0
-	// 		);
-	// 	}
-	// }
+	function addToWhitelist(address[] memory newAddresses) external onlyOwner {
+		for (uint a = 0; a < newAddresses.length; a++) {
+			bool result = _whitelistedAddressQtyMap.set(
+				newAddresses[a],
+				_mintEconomics.maxWlAddressMint
+			);
+			emit MinterContractMessage(
+				"ADD WL",
+				newAddresses[a],
+				result ? 1 : 0
+			);
+		}
+	}
 
-	// remove address from WL
-	// function removeFromWhitelist(
-	// 	address[] memory oldAddresses
-	// ) external onlyOwner {
-	// 	for (uint a = 0; a < oldAddresses.length; a++) {
-	// 		bool result = _whitelistedAddressQtyMap.remove(oldAddresses[a]);
-	// 		emit MinterContractMessage(
-	// 			"REM WL",
-	// 			oldAddresses[a],
-	// 			result ? 1 : 0
-	// 		);
-	// 	}
-	// }
+	//remove address from WL
+	function removeFromWhitelist(
+		address[] memory oldAddresses
+	) external onlyOwner {
+		for (uint a = 0; a < oldAddresses.length; a++) {
+			bool result = _whitelistedAddressQtyMap.remove(oldAddresses[a]);
+			emit MinterContractMessage(
+				"REM WL",
+				oldAddresses[a],
+				result ? 1 : 0
+			);
+		}
+	}
 
-	// clear the whole WL
-	/// Also rerurns numAddressesRemoved how many WL entries were removed
-	// function clearWhitelist()
-	// 	external
-	// 	onlyOwner
-	// 	returns (uint numAddressesRemoved)
-	// {
-	// 	numAddressesRemoved = MinterLibrary.clearWhitelist(
-	// 		_whitelistedAddressQtyMap
-	// 	);
-	// }
+	//clear the whole WL
+	//Also rerurns numAddressesRemoved how many WL entries were removed
+	function clearWhitelist()
+		external
+		onlyOwner
+		returns (uint numAddressesRemoved)
+	{
+		numAddressesRemoved = MinterLibrary.clearWhitelist(
+			_whitelistedAddressQtyMap
+		);
+	}
 
 	// function to allow the burning oF NFTs
-	// function burnNFTs(
-	// 	int64[] memory serialNumbers
-	// ) external returns (int responseCode, uint64 newTotalSupply) {
-	// 	require(serialNumbers.length <= 10, "MaxSerial");
-	// 	// need to transfer back to treasury to burn
-	// 	address[] memory senderList = new address[](serialNumbers.length);
-	// 	address[] memory receiverList = new address[](serialNumbers.length);
-	// 	for (uint256 s = 0; s < serialNumbers.length; s++){
-	// 		senderList[s] = msg.sender;
-	// 		receiverList[s] = address(this);
-	// 	}
+	function burnNFTs(
+		int64[] memory serialNumbers
+	) external returns (int responseCode, uint64 newTotalSupply) {
+		require(serialNumbers.length <= 10, "MaxSerial");
+		// need to transfer back to treasury to burn
+		address[] memory senderList = new address[](serialNumbers.length);
+		address[] memory receiverList = new address[](serialNumbers.length);
+		for (uint256 s = 0; s < serialNumbers.length; s++){
+			senderList[s] = msg.sender;
+			receiverList[s] = address(this);
+		}
 
-	// 	responseCode = transferNFTs(
-	// 		_token,
-	// 		senderList,
-	// 		receiverList,
-	// 		serialNumbers
-	// 	);
+		responseCode = transferNFTs(
+			_token,
+			senderList,
+			receiverList,
+			serialNumbers
+		);
 
-	// 	if (responseCode != HederaResponseCodes.SUCCESS) {
-	// 		revert("FTNftBrn");
-	// 	}
+		if (responseCode != HederaResponseCodes.SUCCESS) {
+			revert("FTNftBrn");
+		}
 
-	// 	(responseCode, newTotalSupply) = burnToken(_token, 0, serialNumbers);
+		(responseCode, newTotalSupply) = burnToken(_token, 0, serialNumbers);
 
-	// 	if (responseCode != HederaResponseCodes.SUCCESS) {
-	// 		revert("Brn");
-	// 	}
-	// }
+		if (responseCode != HederaResponseCodes.SUCCESS) {
+			revert("Brn");
+		}
+	}
 
-	 // update cost of mint price
-	 // @param hbarCost in *tinybar*
+	 //update cost of mint price
+	 ///@param hbarCost in *tinybar*
 
-	// function updateCost(uint256 hbarCost) external onlyOwner {
-	// 	if (_mintEconomics.mintPriceHbar != hbarCost) {
-	// 		_mintEconomics.mintPriceHbar = hbarCost;
-	// 		emit MinterContractMessage(
-	// 			"Hbar MPx",
-	// 			msg.sender,
-	// 			_mintEconomics.mintPriceHbar
-	// 		);
-	// 	}
-	// }
+	function updateCost(uint256 hbarCost) external onlyOwner {
+		if (_mintEconomics.mintPriceHbar != hbarCost) {
+			_mintEconomics.mintPriceHbar = hbarCost;
+			emit MinterContractMessage(
+				"Hbar MPx",
+				msg.sender,
+				_mintEconomics.mintPriceHbar
+			);
+		}
+	}
 
 	// mintPaused boolean to pause (true) or release (false)
-	// function updatePauseStatus(
-	// 	bool mintPaused
-	// ) external onlyOwner returns (bool changed) {
-	// 	changed = _mintTiming.mintPaused == mintPaused ? false : true;
-	// 	if (changed)
-	// 		emit MinterContractMessage(
-	// 			mintPaused ? "PAUSED" : "UNPAUSED",
-	// 			msg.sender,
-	// 			mintPaused ? 1 : 0
-	// 		);
-	// 	_mintTiming.mintPaused = mintPaused;
-	// }
+	function updatePauseStatus(
+		bool mintPaused
+	) external onlyOwner returns (bool changed) {
+		changed = _mintTiming.mintPaused == mintPaused ? false : true;
+		if (changed)
+			emit MinterContractMessage(
+				mintPaused ? "PAUSED" : "UNPAUSED",
+				msg.sender,
+				mintPaused ? 1 : 0
+			);
+		_mintTiming.mintPaused = mintPaused;
+	}
 
-	// lock mint during WL only minting for Wled addresses
-	// function updateWlOnlyStatus(
-	// 	bool wlOnly
-	// ) external onlyOwner returns (bool changed) {
-	// 	changed = _mintTiming.wlOnly == wlOnly ? false : true;
-	// 	if (changed)
-	// 		emit MinterContractMessage(
-	// 			wlOnly ? "OnlyWL" : "Open",
-	// 			msg.sender,
-	// 			wlOnly ? 1 : 0
-	// 		);
-	// 	_mintTiming.wlOnly = wlOnly;
-	// }
+	//lock mint during WL only minting for Wled addresses
+	function updateWlOnlyStatus(
+		bool wlOnly
+	) external onlyOwner returns (bool changed) {
+		changed = _mintTiming.wlOnly == wlOnly ? false : true;
+		if (changed)
+			emit MinterContractMessage(
+				wlOnly ? "OnlyWL" : "Open",
+				msg.sender,
+				wlOnly ? 1 : 0
+			);
+		_mintTiming.wlOnly = wlOnly;
+	}
 
-	// maxMint int of how many a WL address can mint
-	// function setMaxWlAddressMint(
-	// 	uint maxMint
-	// ) external onlyOwner returns (bool changed) {
-	// 	changed = _mintEconomics.maxWlAddressMint == maxMint ? false : true;
-	// 	if (changed)
-	// 		emit MinterContractMessage("SMaxMint", msg.sender, maxMint);
-	// 	_mintEconomics.maxWlAddressMint = maxMint;
-	// }
+	//maxMint int of how many a WL address can mint
+	function setMaxWlAddressMint(
+		uint maxMint
+	) external onlyOwner returns (bool changed) {
+		changed = _mintEconomics.maxWlAddressMint == maxMint ? false : true;
+		if (changed)
+			emit MinterContractMessage("SMaxMint", msg.sender, maxMint);
+		_mintEconomics.maxWlAddressMint = maxMint;
+	}
 
 	// startTime new start time in seconds
 	function updateMintStartTime(uint256 startTime) external onlyOwner {
@@ -519,7 +518,7 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
 	}
 
 	// update wlToken
-	function updatewlToken(address wlToken) external onlyOwner {
+	function updateWlToken(address wlToken) external onlyOwner {
 		_mintEconomics.wlToken = wlToken;
 	}
 
@@ -533,19 +532,16 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
 		_cid = cid;
 	}
 
-	// metadata new metadata array
-	function updateMetadataArray(
-		string[] memory metadata,
-		uint startIndex
-	) external onlyOwner {
-		// enforce consistency of the metadata list
+	/// @param metadata new metadata array
+    function updateMetadataArray(string[] memory metadata, uint startIndex) external onlyOwner {
+		// enforce consistency of the metadata lists
 		require((startIndex + metadata.length) <= _metadata.length, "offset");
 		uint index = 0;
 		for (uint i = startIndex; i < (startIndex + metadata.length); i++) {
 			_metadata[i] = metadata[index];
 			index++;
 		}
-	}
+    }
 
 	// method to push metadata end points up
     function addMetadata(
@@ -569,48 +565,48 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
     // @param removeToken reset token to zero address
     // @param batch allow for batched reset
 
-    // function resetContract(bool removeToken, uint batch) external onlyOwner {
-    //     if (removeToken) {
-    //         _token = address(0);
-    //         _totalMinted = 0;
-    //     }
-    //     MinterLibrary.resetContract(
-    //         _addressToNumMintedMap,
-    //         _metadata,
-    //         _walletMintTimeMap,
-    //         _wlAddressToNumMintedMap,
-    //         _serialMintTimeMap,
-    //         _wlSerialsUsed,
-    //         batch
-    //     );
+    function resetContract(bool removeToken, uint batch) external onlyOwner {
+        if (removeToken) {
+            _token = address(0);
+            _totalMinted = 0;
+        }
+        MinterLibrary.resetContract(
+            _addressToNumMintedMap,
+            _metadata,
+            _walletMintTimeMap,
+            _wlAddressToNumMintedMap,
+            _serialMintTimeMap,
+            _wlSerialsUsed,
+            batch
+        );
 
-    //     emit MinterContractMessage(
-    //         removeToken ? "ClrTkn" : "RstCtrct",
-    //         msg.sender,
-    //         0
-    //     );
-    // }
+        emit MinterContractMessage(
+            removeToken ? "ClrTkn" : "RstCtrct",
+            msg.sender,
+            0
+        );
+    }
 
-	// @return metadataList of metadata unminted -> only owner
 
-    // function getMetadataArray(
-    //     uint startIndex,
-    //     uint endIndex
-    // ) external view onlyOwner returns (string[] memory metadataList) {
-    //     require(endIndex > startIndex, "args");
-    //     require(endIndex <= _metadata.length, "OOR");
-    //     metadataList = new string[](endIndex - startIndex);
-    //     uint index = 0;
-    //     for (uint i = startIndex; i < endIndex; i++) {
-    //         metadataList[index] = _metadata[i];
-    //         index++;
-    //     }
-    // }
+ 	/// @return metadataList of metadata unminted -> only owner
+    function getMetadataArray(uint startIndex, uint endIndex) 
+		external view onlyOwner 
+		returns (string[] memory metadataList) 
+	{
+		require(endIndex > startIndex, "args");
+		require(endIndex <= _metadata.length, "OOR");
+		metadataList = new string[](endIndex - startIndex);
+		uint index = 0;
+        for (uint i = startIndex; i < endIndex; i++) {
+			metadataList[index] = _metadata[i];
+			index++;
+		}
+    }
 
 	// @return token the address for the NFT to be minted
-    // function getNFTTokenAddress() external view returns (address token) {
-    //     token = _token;
-    // }
+    function getNFTTokenAddress() external view returns (address token) {
+        token = _token;
+    }
 
     // @return numMinted helper function to check how many a wallet has minted
     function getNumberMintedByAddress() external view returns (uint numMinted) {
@@ -631,18 +627,18 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
     // @return walletList list of wallets who minted
     // @return numMintedList lst of number minted
 
-    // function getNumberMintedByAllAddresses()
-    //     external
-    //     view
-    //     onlyOwner
-    //     returns (address[] memory walletList, uint[] memory numMintedList)
-    // {
-    //     walletList = new address[](_addressToNumMintedMap.length());
-    //     numMintedList = new uint[](_addressToNumMintedMap.length());
-    //     for (uint a = 0; a < _addressToNumMintedMap.length(); a++) {
-    //         (walletList[a], numMintedList[a]) = _addressToNumMintedMap.at(a);
-    //     }
-    // }
+    function getNumberMintedByAllAddresses()
+        external
+        view
+        onlyOwner
+        returns (address[] memory walletList, uint[] memory numMintedList)
+    {
+        walletList = new address[](_addressToNumMintedMap.length());
+        numMintedList = new uint[](_addressToNumMintedMap.length());
+        for (uint a = 0; a < _addressToNumMintedMap.length(); a++) {
+            (walletList[a], numMintedList[a]) = _addressToNumMintedMap.at(a);
+        }
+    }
 
 	/// @return wlNumMinted helper function to check how many a WLed wallet has minted
     function getNumberMintedBywlAddress()
@@ -662,9 +658,9 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
         }
     }
 
-	// Likely only viable with smaller mints
-    /// @return wlWalletList list of wallet who minted
-    /// @return wlNumMintedList lst of number minted
+	// // Likely only viable with smaller mints
+    // /// @return wlWalletList list of wallet who minted
+    // /// @return wlNumMintedList lst of number minted
     function getNumberMintedByAllWlAddresses()
         external
         view
@@ -690,20 +686,20 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
         batchSize = _batchSize;
     }
 
-    // /// check the current Whitelist for minting
-    // /// @return wl an array of addresses currently enabled for allowance approval
-    // function getWhitelist()
-    //     external
-    //     view
-    //     returns (address[] memory wl, uint[] memory wlQty)
-    // {
-    //     wl = new address[](_whitelistedAddressQtyMap.length());
-    //     wlQty = new uint[](_whitelistedAddressQtyMap.length());
+    // check the current Whitelist for minting
+    /// @return wl an array of addresses currently enabled for allowance approval
+    function getWhitelist()
+        external
+        view
+        returns (address[] memory wl, uint[] memory wlQty)
+    {
+        wl = new address[](_whitelistedAddressQtyMap.length());
+        wlQty = new uint[](_whitelistedAddressQtyMap.length());
 
-    //     for (uint a = 0; a < _whitelistedAddressQtyMap.length(); a++) {
-    //         (wl[a], wlQty[a]) = _whitelistedAddressQtyMap.at(a);
-    //     }
-    // }
+        for (uint a = 0; a < _whitelistedAddressQtyMap.length(); a++) {
+            (wl[a], wlQty[a]) = _whitelistedAddressQtyMap.at(a);
+        }
+    }
 
 	/// @return mintEconomics basic struct with mint economics details
     function getMintEconomics()
@@ -723,15 +719,15 @@ contract StripMinter is Ownable, ReentrancyGuard, HederaTokenService, KeyHelper{
         mintTiming = _mintTiming;
     }
 
-    // // check if the address is in wl
-    // // @param addressToCheck the address to check in WL
-    // // @return inwl if in the WL
-    // // @return qty the number of WL mints (0 = unbounded)
-    // function isAddressWL(
-    //     address addressToCheck
-    // ) external view returns (bool inWl, uint qty) {
-    //     (inWl, qty) = _whitelistedAddressQtyMap.tryGet(addressToCheck);
-    // }
+    // check if the address is in wl
+    /// @param addressToCheck the address to check in WL
+    // @return inwl if in the WL
+    // @return qty the number of WL mints (0 = unbounded)
+    function isAddressWL(
+        address addressToCheck
+    ) external view returns (bool inWl, uint qty) {
+        (inWl, qty) = _whitelistedAddressQtyMap.tryGet(addressToCheck);
+    }
 
 
     receive() external payable {
